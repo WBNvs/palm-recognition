@@ -20,6 +20,14 @@ import './utils/error-log' // error log
 
 import * as filters from './filters' // global filters
 
+import axios from 'axios'
+
+// 将 Axios 添加到 Vue 实例中
+Vue.prototype.$axios = axios
+
+// 你也可以配置基础URL（如果你的 API 地址是固定的）
+axios.defaults.baseURL = 'http://127.0.0.1:5000'
+
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api
