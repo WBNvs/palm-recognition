@@ -73,7 +73,7 @@
     </el-button>
 
     <!-- 识别结果 -->
-    <div v-if="result" class="result-container">
+    <div v-if="isProcessed" class="result-container">
       <el-divider>识别结果</el-divider>
       <p>{{ result }}</p>
     </div>
@@ -89,7 +89,8 @@ export default {
       standardPreviewUrls: [],
       comparisonPreviewUrls: [],
       isProcessing: false,
-      result: null
+      isProcessed: false, // 标记是否处理完成
+      result: null// 存储从后端返回的结果
     }
   },
   beforeDestroy() {
@@ -123,27 +124,27 @@ export default {
         this.comparisonPreviewUrls.splice(index, 1)
       }
     },
-    // 调用大模型进行掌纹识别
+    // 调用后端 API 进行掌纹识别
     async comparePalmprints() {
       if (this.standardFileList.length === 0 || this.comparisonFileList.length === 0) {
         this.$message.error('请确保上传了标准图片组和对比图片组')
         return
       }
-
       this.isProcessing = true
+      this.isProcessed = false// 重置处理状态
       const formData = new FormData()
       this.standardFileList.forEach((file) => formData.append('standard_images', file))
       this.comparisonFileList.forEach((file) => formData.append('comparison_images', file))
-
       try {
-        const response = await this.$axios.post('/api/palmprint/compare', formData, {
+        const response = await this.$axios.post('http://127.0.0.1:5000/api/palmprint/compare/', formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         })
-        this.result = response.data.result// 假设后端返回的字段为 result
+        this.result = response.data.result// 将后端返回的结果保存到 result 中
+        this.isProcessed = true// 更新为已处理状态
         this.$message.success('识别完成！')
       } catch (error) {
         this.$message.error('识别失败，请重试')
-        console.error(error)
+        console.error('错误详情：', error.response || error.message || error)
       } finally {
         this.isProcessing = false
       }
