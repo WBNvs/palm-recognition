@@ -36,7 +36,14 @@ module.exports = {
       warnings: false,
       errors: true
     },
-    before: require('./mock/mock-server.js')
+    before: require('./mock/mock-server.js'),
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:5000', // 后端 Flask 服务地址
+        changeOrigin: true, // 允许跨域
+        secure: false// 支持 HTTPS
+      }
+    }
   },
   configureWebpack: {
     // provide the app's title in webpack's name field, so that
